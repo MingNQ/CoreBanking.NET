@@ -15,3 +15,45 @@ Content-Type: application/json
 }
 
 ###
+
+GET {{CoreBanking.API_HostAddress}}/api/v1/corebanking/accounts
+Accept: application/json
+
+###
+
+POST {{CoreBanking.API_HostAddress}}/api/v1/corebanking/accounts
+Content-Type: application/json
+
+{
+    "customerid": "01975f4e-7d64-7838-a6d1-698be7dcf51c"
+}
+
+###
+
+PUT {{CoreBanking.API_HostAddress}}/api/v1/corebanking/accounts/01975fab-d194-7187-b827-0b547efdc706/deposit
+Content-Type: application/json
+
+{
+    "amount": 300
+}
+
+###
+
+PUT {{CoreBanking.API_HostAddress}}/api/v1/corebanking/accounts/01975fab-d194-7187-b827-0b547efdc706/withdraw
+Content-Type: application/json
+
+{
+    "amount": 450
+}
+
+###
+
+PUT {{CoreBanking.API_HostAddress}}/api/v1/corebanking/accounts/01975fab-d194-7187-b827-0b547efdc706/transfer
+Content-Type: application/json
+
+{
+    "toaccountnumber": "638852553841654644",
+    "amount": 150
+}
+
+###
