@@ -1,4 +1,6 @@
 ﻿using Asp.Versioning;
+using CoreBanking.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace CoreBanking.API.Bootstraping;
 
@@ -20,6 +22,12 @@ public static class ApplicationServiceExtensions
                     new UrlSegmentApiVersionReader(), 
                     new HeaderApiVersionReader("X-Version"));
             });
+
+        builder.AddNpgsqlDbContext<CoreBankingDbContext>("corebanking-db", configureDbContextOptions: dbContextOptionsBuilder =>
+            {
+                dbContextOptionsBuilder.UseNpgsql(builder => builder.MigrationsAssembly(typeof(CoreBankingDbContext).Assembly.FullName));
+            }
+        );
 
         return builder;
     }

@@ -4,7 +4,7 @@
 /// A Frame to request paginated data
 /// </summary>
 /// <param name="pageSize">Page Size</param>
-/// <param name="pageIndex">Current Index</param>
+/// <param name="pageIndex">Current PageIndex</param>
 public class PaginationRequest(int pageSize = 10, int pageIndex = 0)
 {
     public int PageSize { get; set; } = pageSize;
