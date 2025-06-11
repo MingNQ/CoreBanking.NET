@@ -1,8 +1,4 @@
-﻿using Asp.Versioning;
-using CoreBanking.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
-
-namespace CoreBanking.API.Bootstraping;
+﻿namespace CoreBanking.API.Bootstraping;
 
 /// <summary>
 /// Application Service Extensions

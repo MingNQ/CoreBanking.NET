@@ -1,9 +1,4 @@
-﻿using CoreBanking.API.Services;
-using CoreBanking.Infrastructure.Entity;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.EntityFrameworkCore;
-
-namespace CoreBanking.API.Apis;
+﻿namespace CoreBanking.API.Apis;
 
 /// <summary>
 /// API for Core Banking

@@ -1,7 +1,4 @@
-﻿using CoreBanking.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
-
-namespace CoreBanking.API.Services;
+﻿namespace CoreBanking.API.Services;
 
 /// <summary>
 /// Store the services which used in the Core Banking API
