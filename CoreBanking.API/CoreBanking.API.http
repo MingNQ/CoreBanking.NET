@@ -5,6 +5,11 @@ Accept: application/json
 
 ###
 
+GET {{CoreBanking.API_HostAddress}}/api/v1/corebanking/customers/01975f4e-7d64-7838-a6d1-698be7dcf51c
+Accept: application/json
+
+###
+
 POST {{CoreBanking.API_HostAddress}}/api/v1/corebanking/customers
 Content-Type: application/json
 
@@ -17,6 +22,11 @@ Content-Type: application/json
 ###
 
 GET {{CoreBanking.API_HostAddress}}/api/v1/corebanking/accounts
+Accept: application/json
+
+###
+
+GET {{CoreBanking.API_HostAddress}}/api/v1/corebanking/accounts/01975fab-d194-7187-b827-0b547efdc706
 Accept: application/json
 
 ###

@@ -1,4 +1,6 @@
-﻿namespace CoreBanking.API.Apis;
+﻿
+
+namespace CoreBanking.API.Apis;
 
 /// <summary>
 /// API for Core Banking
@@ -11,9 +13,11 @@ public static class CoreBankingAPI
         var v1 = vApi.MapGroup("/api/v{version:apiVersion}/corebanking").HasApiVersion(1, 0);
 
         v1.MapGet("/customers", GetCustomers);
+        v1.MapGet("/customers/{id:guid}", GetCustomerById);
         v1.MapPost("/customers", CreateCustomer);
 
         v1.MapGet("/accounts", GetAccounts);
+        v1.MapGet("/accounts/{id:guid}", GetAccountById);
         v1.MapPost("/accounts", CreateAccount);
 
         v1.MapPut("/accounts/{id:guid}/deposit", Deposit);
@@ -22,6 +26,8 @@ public static class CoreBankingAPI
 
         return builder;
     }
+
+
 
     #region Transaction APIs
 
@@ -208,8 +214,7 @@ public static class CoreBankingAPI
             return TypedResults.BadRequest();
         }
 
-        account.Id = Guid.CreateVersion7();
-        account.Balance = 0; // Initialize balance to zero
+        account.Id = account.Id == Guid.Empty ? Guid.CreateVersion7() : account.Id;
         account.Number = GenerateAccountNumber();
         
         services.DbContext.Accounts.Add(account);
@@ -245,6 +250,20 @@ public static class CoreBankingAPI
                 .Take(pagination.PageSize)
                 .ToListAsync()
         ));
+    }
+
+    private static async Task<Results<Ok<Account>, BadRequest>> GetAccountById(
+        [AsParameters] CoreBankingServices services,
+        Guid id)
+    {
+        var account = await services.DbContext.Accounts.FindAsync(id);
+        if (account == null)
+        {
+            services.Logger.LogWarning("Customer with ID {Id} not found", id);
+            return TypedResults.BadRequest(); // Return an empty customer if not found
+        }
+
+        return TypedResults.Ok(account);
     }
 
     #endregion Account APIs
@@ -289,6 +308,20 @@ public static class CoreBankingAPI
                 .Take(pagination.PageSize)
                 .ToListAsync()
         ));
+    }
+
+    private static async Task<Results<Ok<Customer>, BadRequest>> GetCustomerById(
+        [AsParameters] CoreBankingServices services,
+        Guid Id)
+    {
+        var customer = await services.DbContext.Customers.FindAsync(Id);
+        if (customer == null)
+        {
+            services.Logger.LogWarning("Customer with ID {Id} not found", Id);
+            return TypedResults.BadRequest(); // Return an empty customer if not found
+        }
+
+        return TypedResults.Ok(customer);
     }
 
     #endregion Customer APIs
