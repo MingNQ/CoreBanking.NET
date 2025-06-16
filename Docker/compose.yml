@@ -1,0 +1,97 @@
+name: corebanking-api.net
+
+services:
+  dashboard:
+    image: mcr.microsoft.com/dotnet/aspire-dashboard:9.0
+    environment:
+      - DASHBOARD__OTLP__AUTHMODE=ApiKey
+      - DASHBOARD__OTLP__PRIMARYAPIKEY=104293fef88930cf3c41f27f762d58f5
+
+  postgres:
+    image: postgres:latest
+    restart: always
+    volumes: 
+      - ./data/postgres:/var/lib/postgresql/data
+    env_file:
+      - ./common.env
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: scram-sha-256
+      POSTGRES_INITDB_ARGS: --auth-host=scram-sha-256 --auth-local=scram-sha-256
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    secrets:
+       - db_password
+        
+  corebanking-migrationservice:
+    image: corebankingmigrationservice:latest
+    depends_on:
+      postgres:
+        condition: service_healthy
+      dashboard:
+        condition: service_started
+    env_file:
+      - ./common.env
+      - ./open-telemetry.env
+    environment:
+      OTEL_SERVICE_NAME: corebanking-migrationservice
+    secrets:
+     - connection_strings
+      
+  postgres-pgweb:
+    image: sosedoff/pgweb:latest
+    restart: always
+    volumes: 
+      - ./data/pgweb-bookmarks:/home/pgweb/.pgweb/bookmarks:ro
+    depends_on:
+      corebanking-migrationservice:
+        condition: service_completed_successfully
+    env_file:
+      - ./common.env
+    ports:
+      - 8081:8081
+
+  corebanking-api:
+    image: corebankingapi:latest
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 2
+    depends_on:
+      corebanking-migrationservice:
+        condition: service_completed_successfully
+    environment:
+      OTEL_SERVICE_NAME: corebanking-api
+    env_file:
+      - ./common.env
+      - ./open-telemetry.env
+    secrets:
+     - connection_strings
+
+  http-server:
+    image: nginx:latest
+    ports:
+      - 8080:80
+      - 18888:18888
+    restart: always
+    depends_on:
+      - corebanking-api
+    volumes:
+      - ./data/http-server/templates/default.conf.template:/etc/nginx/templates/default.conf.template:rw
+      - ./data/http-server/etc/nginx/conf.d/:/etc/nginx/conf.d/:rw
+      - ./data/http-server/logs/:/var/log/nginx/
+    environment:
+      CORE_BANKING_API_SERVER_NAME: corebanking-api
+    env_file:
+      - ./common.env
+      
+secrets:
+   db_password:
+     file: ./db_password.txt
+   connection_strings:
+     file: ./connection_strings.txt
+  
